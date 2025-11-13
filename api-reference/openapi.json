@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
+    "title": "OpenAPI Plant Store (Demo - jsonplaceholder)",
+    "description": "Demo OpenAPI spec for recording: uses jsonplaceholder.typicode.com so Mintlify playground returns real responses for demo purposes.",
     "license": {
       "name": "MIT"
     },
@@ -10,49 +10,50 @@
   },
   "servers": [
     {
-      "url": "https://example.com"
+      "url": "https://jsonplaceholder.typicode.com"
     }
   ],
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
+  "security": [],
   "paths": {
-    "/plants": {
+    "/posts": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "summary": "List posts (demo)",
+        "description": "Returns example posts from jsonplaceholder for demo/testing. Use the `limit` query to illustrate parameter behaviour.",
         "parameters": [
           {
             "name": "limit",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "description": "The maximum number of results to return (demo parameter)",
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
+            },
+            "required": false
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "A JSON array of posts (demo response from jsonplaceholder)",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Plant"
+                    "$ref": "#/components/schemas/Post"
                   }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "sample": {
+                    "summary": "Example array",
+                    "value": [
+                      {
+                        "userId": 1,
+                        "id": 1,
+                        "title": "Sample title",
+                        "body": "Sample body text"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -60,50 +61,54 @@
         }
       },
       "post": {
-        "description": "Creates a new plant in the store",
+        "summary": "Create post (demo)",
+        "description": "Creates a new post on the demo API (jsonplaceholder will return a created response). Use this to show request body & cURL examples.",
         "requestBody": {
-          "description": "Plant to add to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/NewPost"
+              },
+              "examples": {
+                "sampleBody": {
+                  "summary": "Create post example",
+                  "value": {
+                    "title": "Demo title",
+                    "body": "Demo body",
+                    "userId": 1
+                  }
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "plant response",
+          "201": {
+            "description": "Post created (demo response code from jsonplaceholder)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/Post"
                 }
               }
             }
           },
           "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "description": "Bad request (demo)"
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/posts/{id}": {
+      "get": {
+        "summary": "Get post by ID (demo)",
+        "description": "Retrieve a single demo resource by ID.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of plant to delete",
+            "description": "ID of the post",
             "required": true,
             "schema": {
               "type": "integer",
@@ -112,41 +117,42 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "Post found (demo)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Post"
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not found (demo)"
           }
         }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
+      },
+      "delete": {
+        "summary": "Delete post (demo)",
+        "description": "Delete a demo resource by ID. jsonplaceholder returns a success status for demonstration.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of post to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Deleted (demo - jsonplaceholder returns a success status)."
+          },
+          "404": {
+            "description": "Not found (demo)"
           }
         }
       }
@@ -154,52 +160,60 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "Post": {
         "type": "object",
+        "required": [
+          "userId",
+          "id",
+          "title",
+          "body"
+        ],
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "userId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "User identifier"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Resource identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Post title"
+          },
+          "body": {
+            "type": "string",
+            "description": "Post body content"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "NewPost": {
+        "type": "object",
+        "required": [
+          "title",
+          "body",
+          "userId"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
           },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
+          "body": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32"
           }
-        ]
+        }
       },
       "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
         "type": "object",
         "properties": {
           "error": {
-            "type": "integer",
-            "format": "int32"
+            "type": "integer"
           },
           "message": {
             "type": "string"
